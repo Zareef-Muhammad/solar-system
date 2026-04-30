@@ -18,11 +18,8 @@ jobs:
     name: Unit-Testing
     strategy:
       matrix:
-        nodejs_version: [18, 19, 20]
-        operating_system: [ubuntu-latest, ubuntu-22.04 ]
-        exclude:
-          - nodejs_version: 18
-            operating_system: ubuntu-22.04
+        nodejs_version: [18, 20]
+        operating_system: [ubuntu-latest]
     runs-on: ${{matrix.operating_system}}
     steps:
       - name: Checkout Repository
@@ -34,8 +31,10 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Unit Testing
+        id: nodejs-unit-testing-step
         run: npm test
       - name: Archive Test Result
+        if: steps.nodejs-unit-testing-step.outcome == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
             name: Mocha-Test Result
